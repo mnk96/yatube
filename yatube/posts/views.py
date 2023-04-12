@@ -102,9 +102,9 @@ def post_edit(request, post_id):
     form = PostForm(request.POST or None,
                     files=request.FILES or None,
                     instance=post)
+    if request.user != post.author:
+        return redirect('posts:post_detail', post_id=post_id)
     if request.method == 'POST':
-        if request.user != post.author:
-            return redirect('posts:post_detail', post_id=post_id)
         if form.is_valid():
             form.save()
             return redirect('posts:post_detail', post_id=post_id)
@@ -145,15 +145,10 @@ def follow_index(request):
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
     if author != request.user:
-        following = Follow.objects.get_or_create(
+        Follow.objects.get_or_create(
             user=request.user,
             author=author,
         )
-        if not following:
-            Follow.objects.create(
-                user=request.user,
-                author=author,
-            )
     return redirect('posts:profile', username)
 
 

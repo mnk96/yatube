@@ -74,10 +74,9 @@ class PostCreateFormTests(TestCase):
             follow=True
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        error = 'Поcт не может быть добавлен'
         self.assertNotEqual(Post.objects.count(),
                             posts_count + 1,
-                            error)
+                            'Поcт не может быть добавлен')
 
     def test_not_create_post_invalid_group(self):
         """Форма с невалидными данными"""
@@ -93,13 +92,12 @@ class PostCreateFormTests(TestCase):
             follow=True
         )
         self.assertEqual(Post.objects.count(), posts_count)
-        error = ('Выберите корректный вариант. '
-                 'Вашего варианта нет среди допустимых значений.')
         self.assertFormError(
             response,
             'form',
             'group',
-            error,
+            ('Выберите корректный вариант. '
+             'Вашего варианта нет среди допустимых значений.'),
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
@@ -165,10 +163,9 @@ class PostCreateFormTests(TestCase):
             follow=True
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        error = 'Комментарий не может быть добавлен'
         self.assertNotEqual(Comment.objects.count(),
                             comment_count + 1,
-                            error)
+                            'Комментарий не может быть добавлен')
 
     def test_create_comment(self):
         """Создание комментария"""

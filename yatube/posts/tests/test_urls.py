@@ -37,7 +37,7 @@ class PostURLTests(TestCase):
                                          follow=True)
         print(response.status_code)
         self.assertRedirects(
-            response, f'/posts/{self.post.id}/edit/',
+            response, f'/posts/{self.post.id}/',
             HTTPStatus.MOVED_PERMANENTLY
         )
 
@@ -46,7 +46,7 @@ class PostURLTests(TestCase):
                                        follow=True)
         print(response.status_code)
         self.assertRedirects(
-            response, f'/posts/{self.post.id}/edit/',
+            response, f'/posts/{self.post.id}/',
             HTTPStatus.MOVED_PERMANENTLY
         )
 
