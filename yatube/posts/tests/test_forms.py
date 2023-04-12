@@ -1,9 +1,12 @@
+from http import HTTPStatus
+
+from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import Client, TestCase
+from django.urls import reverse
+
 from posts.forms import PostForm
 from posts.models import Post, Group, Comment
-from django.test import Client, TestCase
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.urls import reverse
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -55,11 +58,10 @@ class PostCreateFormTests(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertEqual(response.status_code, 200)
-        error = 'Поcт не может быть добавлен'
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertNotEqual(Post.objects.count(),
                             posts_count + 1,
-                            error)
+                            'Поcт не может быть добавлен')
 
     def test_guest_edit(self):
         """Неавторизированный пользователь редактирование поста"""
@@ -71,13 +73,13 @@ class PostCreateFormTests(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         error = 'Поcт не может быть добавлен'
         self.assertNotEqual(Post.objects.count(),
                             posts_count + 1,
                             error)
 
-    def test_not_create_post(self):
+    def test_not_create_post_invalid_group(self):
         """Форма с невалидными данными"""
         posts_count = Post.objects.count()
         form_data = {
@@ -99,7 +101,7 @@ class PostCreateFormTests(TestCase):
             'group',
             error,
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_create_post(self):
         """Валидная форма создает запись в Post."""
@@ -162,7 +164,7 @@ class PostCreateFormTests(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         error = 'Комментарий не может быть добавлен'
         self.assertNotEqual(Comment.objects.count(),
                             comment_count + 1,
@@ -179,5 +181,5 @@ class PostCreateFormTests(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(Post.objects.count(), comment_count + 1)

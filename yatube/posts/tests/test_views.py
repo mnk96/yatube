@@ -1,8 +1,9 @@
+from django import forms
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
-from django import forms
+
 
 from posts.models import Post, Group, Follow
 
@@ -81,9 +82,11 @@ class PostPagesTests(TestCase):
         response = self.authorized_client.get(
             reverse('posts:profile', kwargs={'username': self.author})
         )
-        self.assertIn('page_obj', response.context)
-        self.assertIn('username', response.context)
-        self.assertIn('post_count', response.context)
+        contexts = {
+            'page_obj', 'username', 'post_count'
+        }
+        for context in contexts:
+            self.assertIn(context, response.context)
         post = response.context['page_obj'][0]
         self.assertEqual(post.author, self.post.author)
         self.assertEqual(post.text, self.post.text)
@@ -200,6 +203,25 @@ class PostPagesTests(TestCase):
                                               self.author.username}))
         follow_old = Follow.objects.all().count()
         self.assertEqual(follow_old, 0)
+
+    def test_authorized_client_can_unfollow(self):
+        """Авторизированный пользователь может отписываться от других"""
+        self.authorized.get(reverse('posts:profile_follow',
+                                    kwargs={'username':
+                                            self.author.username}))
+        unfollow_old = Follow.objects.all().count()
+        self.authorized.get(reverse('posts:profile_unfollow',
+                                    kwargs={'username': self.author.username}))
+        unfollow = Follow.objects.all().count()
+        self.assertEqual(unfollow_old, unfollow + 1)
+
+    def test_guest_client_can_not_unfollow(self):
+        """Неавторизированный пользователь не может отписываться от других"""
+        self.guest_client.get(reverse('posts:profile_unfollow',
+                                      kwargs={'username':
+                                              self.author.username}))
+        unfollow_old = Follow.objects.all().count()
+        self.assertEqual(unfollow_old, 0)
 
     def tearDown(self):
         cache.clear()

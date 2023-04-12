@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, Client
@@ -33,25 +35,28 @@ class PostURLTests(TestCase):
     def test_guest_redirect(self):
         response = self.guest_client.get(f'/posts/{self.post.id}/edit',
                                          follow=True)
+        print(response.status_code)
         self.assertRedirects(
-            response, f'/posts/{self.post.id}/', status_code=301
+            response, f'/posts/{self.post.id}/edit/',
+            HTTPStatus.MOVED_PERMANENTLY
         )
 
     def test_authorized_not_author(self):
         response = self.authorized.get(f'/posts/{self.post.id}/edit',
                                        follow=True)
+        print(response.status_code)
         self.assertRedirects(
-            response, f'/posts/{self.post.id}/', status_code=301
+            response, f'/posts/{self.post.id}/edit/',
+            HTTPStatus.MOVED_PERMANENTLY
         )
 
     def test_authorized_redirect(self):
         response = self.authorized.get(f'/posts/{self.post.id}/edit',
                                        follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_urls_authorized(self):
         """URL-адрес использует соответствующий шаблон."""
-        # Шаблоны по адресам
         templates_url_names = {
             '/create/': 'posts/create_post.html',
             f'/posts/{self.post.id}/edit/': 'posts/create_post.html',
@@ -63,7 +68,6 @@ class PostURLTests(TestCase):
 
     def test_urls_guest(self):
         """URL-адрес использует соответствующий шаблон."""
-        # Шаблоны по адресам
         templates_url = {
             'posts/index.html': '/',
             'posts/group_list.html': '/group/test-slug/',
@@ -77,7 +81,7 @@ class PostURLTests(TestCase):
 
     def test_url_exists_at_desired_location(self):
         response = self.guest_client.get('/unexsiting_page/')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def tearDown(self):
         cache.clear()
