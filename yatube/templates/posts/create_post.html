@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %} 
+{% if is_edit %}
+<h1>Редактировать пост</h1>
+{% else %}
+<h1>Новый пост</h1>
+{% endif %} {% endblock %}
+{% include 'includes/header.html' %}
+{% block content %}
+    <main>
+      <div class="container py-5">
+        <div class="row justify-content-center">
+          <div class="col-md-8 p-5">
+            <div class="card">
+              <div class="card-header">       
+                {% if is_edit %}
+                Редактировать пост
+                {% else %}
+                Новый пост
+                {% endif %}            
+              </div>
+              <div class="card-body">        
+                <form method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  {% for field in form %}      
+                  <div class="form-group row my-3 p-3">
+                    <label for="{{ field.id_for_label }}">
+                      {{ field.label }}
+                      {% if field.field.required %}           
+                      <span class="required text-danger" >*</span>
+                      {% endif %}              
+                    </label>
+                  {{ field }}
+                  {% if field.help_text %}            
+                    <small id="{{ field.id_for_label.verbose_name }}" class="form-text text-muted">
+                      {{ field.help_text|safe }}
+                    </small>    
+                  {% endif %}              
+                  </div> 
+                  {% endfor %}           
+                  <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">
+                      {% if is_edit %}
+                      Сохранить
+                    {% else %}
+                      Добавить
+                    {% endif %} 
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    {% endblock %}
+    <footer>
+      {% include 'includes/footer.html' %}  
+  </footer>
+  </body>
+

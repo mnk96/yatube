@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Об авторе проекта{% endblock %}
+{% block content %}
+<h1>Привет, я автор</h1>
+<p>
+  Меня зовут Наташа. Это мой первый большой проект на Python.
+  Работать над этим проектом мне помогли мои черепашки, но не ниндзя.
+  Ссылка на мой <a href='https://github.com/mnk96'> Github</a>
+</p>
+<p> Моё идеальное рабочее место выглядит так</p>
+{% load static %}
+<img src="{% static 'img/table.jpg' %}"  width="700" height="500" class="d-inline-block align-top" alt="">
+{% endblock %} 
